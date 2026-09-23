@@ -3,7 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from fla.layers.kda import KimiDeltaAttention
-
+ 
+#1,002,931,488
 
 class GPT(nn.Module):
     def __init__(
