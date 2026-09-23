@@ -65,6 +65,25 @@ class Embedding(nn.Module):
         return self.embedding(x)
 
 
+class LMHead(nn.Module):
+    def __init__(self, d_model, vocab_size):
+        super().__init__()
+
+        self.proj = nn.Linear(d_model, vocab_size, bias=False)
+
+        nn.init.trunc_normal_(
+            self.proj.weight,
+            mean=0.0,
+            std=0.02,
+            a=-0.06,
+            b=0.06,
+        )
+
+    def forward(self, x):
+        logits = self.proj(x)
+        return logits
+
+
 class FFN(nn.Module):
     def __init__(self, d_model, d_ff):
         super().__init__()
@@ -90,35 +109,26 @@ class KDA(nn.Module):
     def __init__(self, d_model, num_heads, head_dim):
         super().__init__()
 
-        self.kda = KimiDeltaAttention(hidden_size=d_model, num_heads=num_heads, head_dim=head_dim)
+        self.kda = KimiDeltaAttention(
+            hidden_size=d_model,
+            num_heads=num_heads,
+            head_dim=head_dim,
+        )
+
+        for module in self.kda.modules():
+            if isinstance(module, nn.Linear):
+                nn.init.trunc_normal_(
+                    module.weight,
+                    mean=0.0,
+                    std=0.02,
+                    a=-0.06,
+                    b=0.06,
+                )
 
     def forward(self, x):
         output, _, _ = self.kda(x)
         return output
 
-
-class KDABlock(nn.Module):
-    def __init__(self, d_model, d_ff, num_heads, head_dim):
-        super().__init__()
-
-        self.attn_norm = nn.RMSNorm(d_model, eps=1e-6)
-        self.kda = KDA(d_model, num_heads, head_dim)
-
-        self.ffn_norm = nn.RMSNorm(d_model, eps=1e-6)
-        self.ffn = FFN(d_model, d_ff)
-
-    def forward(self, x):
-        residual = x
-        x = self.attn_norm(x)
-        x = self.kda(x)
-        x = residual + x
-
-        residual = x
-        x = self.ffn_norm(x)
-        x = self.ffn(x)
-        x = residual + x
-
-        return x
 
 class GatedAttention(nn.Module):
     def __init__(self, d_model, num_heads, num_kv_heads, head_dim):
@@ -157,7 +167,6 @@ class GatedAttention(nn.Module):
         q = q.view(batch_size, seq_len, self.num_heads, self.head_dim)
         k = k.view(batch_size, seq_len, self.num_kv_heads, self.head_dim)
         v = v.view(batch_size, seq_len, self.num_kv_heads, self.head_dim)
-        gate = gate.view(batch_size, seq_len, self.num_heads, self.head_dim)
 
         q = self.q_norm(q)
         k = self.k_norm(k)
@@ -173,18 +182,36 @@ class GatedAttention(nn.Module):
         attn_output = F.scaled_dot_product_attention(q, k, v, is_causal=True)
 
         attn_output = attn_output.transpose(1, 2)
+        attn_output = attn_output.reshape(batch_size, seq_len, self.num_heads * self.head_dim)
 
         gate = torch.sigmoid(gate)
         attn_output = attn_output * gate
 
-        attn_output = attn_output.reshape(
-            batch_size,
-            seq_len,
-            self.num_heads * self.head_dim,
-        )
-
         output = self.o_proj(attn_output)
         return output
+
+class KDABlock(nn.Module):
+    def __init__(self, d_model, d_ff, num_heads, head_dim):
+        super().__init__()
+
+        self.attn_norm = nn.RMSNorm(d_model, eps=1e-6)
+        self.kda = KDA(d_model, num_heads, head_dim)
+
+        self.ffn_norm = nn.RMSNorm(d_model, eps=1e-6)
+        self.ffn = FFN(d_model, d_ff)
+
+    def forward(self, x):
+        residual = x
+        x = self.attn_norm(x)
+        x = self.kda(x)
+        x = residual + x
+
+        residual = x
+        x = self.ffn_norm(x)
+        x = self.ffn(x)
+        x = residual + x
+
+        return x
 
 
 class GatedAttentionBlock(nn.Module):
@@ -210,20 +237,3 @@ class GatedAttentionBlock(nn.Module):
 
         return x
 
-class LMHead(nn.Module):
-    def __init__(self, d_model, vocab_size):
-        super().__init__()
-
-        self.proj = nn.Linear(d_model, vocab_size, bias=False)
-
-        nn.init.trunc_normal_(
-            self.proj.weight,
-            mean=0.0,
-            std=0.02,
-            a=-0.06,
-            b=0.06,
-        )
-
-    def forward(self, x):
-        logits = self.proj(x)
-        return logits
