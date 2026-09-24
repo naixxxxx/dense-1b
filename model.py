@@ -4,17 +4,6 @@ import torch.nn.functional as F
 
 from fla.layers.kda import KimiDeltaAttention
  
-"""
-    暂定
-    1,002,931,488
-    vocab_size=151936,
-    d_model=1280,
-    d_ff=3840,
-    num_layers=24,
-    num_heads=16,
-    num_kv_heads=4,
-    head_dim=128,
-"""
 
 class GPT(nn.Module):
     def __init__(
