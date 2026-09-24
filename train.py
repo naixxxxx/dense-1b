@@ -34,7 +34,7 @@ eps = 1e-8
 warmup = 0.02
 stable = 0.88
 decay = 0.1
-min_lr_ratio = 0.1
+min_lr_ratio = 0.00
 
 
 muon_params = []

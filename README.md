@@ -23,5 +23,5 @@
     warmup = 0.02
     stable = 0.88
     decay = 0.1
-    min_lr_ratio = 0.1
+    min_lr_ratio = 0.00
 """
