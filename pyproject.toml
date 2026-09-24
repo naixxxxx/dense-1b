@@ -1,7 +1,7 @@
 [project]
-name = "dense-1b-zh"
+name = "dense-1b"
 version = "0.1.0"
-description = "Add your description here"
+description = "dense-1b"
 readme = "README.md"
 authors = [
     { name = "naixxxxx", email = "2361119782@qq.com" }
@@ -10,6 +10,7 @@ requires-python = ">=3.12"
 dependencies = [
     "flash-linear-attention[cuda]>=0.5.2",
     "torch>=2.14.0",
+    "transformers>=5.17.0",
     "wandb>=0.30.0",
 ]
 
