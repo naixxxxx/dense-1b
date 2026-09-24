@@ -8,4 +8,20 @@
     num_heads=16,
     num_kv_heads=4,
     head_dim=128,
+    
+    # Muon
+    lr = 2e-2
+    momentum = 0.95
+    nesterov = True
+
+    # AdamW
+    lr = 3e-4
+    betas = (0.9, 0.95)
+    eps = 1e-8
+
+    # WSD
+    warmup = 0.02
+    stable = 0.88
+    decay = 0.1
+    min_lr_ratio = 0.1
 """
