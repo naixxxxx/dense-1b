@@ -125,6 +125,9 @@ class KDA(nn.Module):
                     b=0.06,
                 )
 
+                if module.bias is not None:
+                    nn.init.zeros_(module.bias)
+
     def forward(self, x):
         output, _, _ = self.kda(x)
         return output
