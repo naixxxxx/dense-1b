@@ -81,6 +81,6 @@ while True:
         )
 
     loss.backward()
-
+    adamw_optimizer.zero_grad()
     muon_optimizer.step()
     adamw_optimizer.step()

@@ -20,7 +20,6 @@
     # AdamW
     lr = 3e-4
     betas = (0.9, 0.95)
-    eps = 1e-8
 
     # WSD
     warmup = 0.02
@@ -45,4 +44,9 @@
     - etc. 1D / scalar parameters
 """
 
-代办 WSD 混合精度训练 权重衰减 模型加载保存 wandb
+代办 WSD  wandb指标  
+lr
+loss
+grad_norm
+tokens
+模型加载保存  改成DDP
