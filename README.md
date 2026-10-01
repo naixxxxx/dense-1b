@@ -1,4 +1,3 @@
-"""
     # parameters
     parameters=1,002,931,488
     vocab_size=151936,
@@ -42,11 +41,8 @@
     - A_log
     - dt_bias
     - etc. 1D / scalar parameters
-"""
 
-代办 WSD  wandb指标  
-lr
-loss
-grad_norm
-tokens
+
+代办: get_batch all_tokens token_seen
+ WSD  wandb指标  lr loss grad_norm tokens
 模型加载保存  改成DDP

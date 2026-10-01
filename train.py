@@ -81,6 +81,8 @@ while True:
         )
 
     loss.backward()
-    adamw_optimizer.zero_grad()
+
+    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+
     muon_optimizer.step()
     adamw_optimizer.step()
