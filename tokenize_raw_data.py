@@ -13,18 +13,18 @@ EOD_ID = tokenizer.convert_tokens_to_ids("<|endoftext|>")
 
 parquet_file = pq.ParquetFile(path)                                                                                                                                
 
-with open("data/en_000.bin", "wb") as f:
+with open("data/en_000.bin", "ab") as f:
 
     for batch in parquet_file.iter_batches(
         batch_size=1024,
         columns=["content"],
     ):
-        texts = batch.column("content").to_pylist() # tets is a list of strings
+        texts = batch.column("content").to_pylist() # texts is a list of strings
 
-        encoded_list = tokenizer(  # list[list[int]]
+        encoded_list = tokenizer(  
             texts, 
             add_special_tokens=False,
-        )["input_ids"]
+        )["input_ids"] # list[list[int]]
 
         id_list = []
 
