@@ -9,6 +9,8 @@ tokens = np.memmap(
     mode="r",
 )
 
+TOTAL_TOKENS = len(tokens)
+
 pos = 0
 
 

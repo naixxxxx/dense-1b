@@ -1,5 +1,5 @@
 """
-    #
+    # parameters
     parameters=1,002,931,488
     vocab_size=151936,
     d_model=1280,
@@ -9,10 +9,13 @@
     num_kv_heads=4,
     head_dim=128,
     
+    # tokens 20B
+    seq 4096
+
     # Muon
     lr = 2e-2
     momentum = 0.95
-    nesterov = True
+    nesterov=True
 
     # AdamW
     lr = 3e-4
@@ -41,3 +44,5 @@
     - dt_bias
     - etc. 1D / scalar parameters
 """
+
+代办 WSD 混合精度训练 权重衰减 模型加载保存 wandb

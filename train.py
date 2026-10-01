@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 
 from model import GPT
-from get_batch import get_batch
+from get_batch import get_batch,TOTAL_TOKENS
 
 device = "cuda"
 
@@ -42,14 +42,15 @@ muon_optimizer = torch.optim.Muon(
     muon_params,
     lr=0.02,
     momentum=0.95,
-    weight_decay=0.01,
+    weight_decay=0.1,
+    nesterov=True
 )
 
 adamw_optimizer = torch.optim.AdamW(
     [
         {
             "params": adamw_decay_params,
-            "weight_decay": 0.01,
+            "weight_decay": 0.1,
         },
         {
             "params": adamw_no_decay_params,
