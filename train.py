@@ -60,3 +60,27 @@ adamw_optimizer = torch.optim.AdamW(
     lr=3e-4,
     betas=(0.9, 0.95),
 )
+
+while True:
+    batch = get_batch()
+    if batch is None:
+        break
+
+    x, y = batch
+    x = x.unsqueeze(0).to(device)  # [4096] → [1, 4096]
+    y = y.unsqueeze(0).to(device)
+
+    muon_optimizer.zero_grad()
+    adamw_optimizer.zero_grad()
+
+    with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+        logits = model(x)  # [1, 4096, vocab_size]
+        loss = F.cross_entropy(
+            logits.reshape(-1, logits.size(-1)),
+            y.reshape(-1),
+        )
+
+    loss.backward()
+
+    muon_optimizer.step()
+    adamw_optimizer.step()
