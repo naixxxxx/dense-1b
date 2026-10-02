@@ -2,7 +2,7 @@ import numpy as np
 import pyarrow.parquet as pq
 from transformers import AutoTokenizer
 
-path = "raw_data/part-00000-f36f5a53-4a77-434b-b9bc-67ed69b93fe2-c000.snappy.parquet"
+path = "raw_data/xxxx.parquet"
 
 tokenizer = AutoTokenizer.from_pretrained(
     "Qwen/Qwen3-0.6B-Base",
