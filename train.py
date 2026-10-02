@@ -1,13 +1,16 @@
+import os
+from pathlib import Path
+
+
 import torch
 import torch.nn.functional as F
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
+
 import wandb
 import get_batch as data # data.TOTAL_TOKENS data.tokens_seen
-import os
-import torch.distributed as dist
-from pathlib import Path
 from model import GPT
 from scheduler import get_wsd_lr_ratio
-from torch.nn.parallel import DistributedDataParallel as DDP
 
 
 local_rank = int(os.environ["LOCAL_RANK"])
