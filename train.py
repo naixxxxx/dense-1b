@@ -111,7 +111,7 @@ if Path("checkpoints/latest.pt").is_file():
 ddp_model = DDP(model, device_ids=[local_rank])
 
 if rank == 0:
-    run = wandb.init(project="pretrain-dense-1b")
+    run = wandb.init(project="pretrain-dense-1b",name="test-3060-ddp",)
 
     run.define_metric("tokens")
     run.define_metric("loss", step_metric="tokens")
