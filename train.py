@@ -10,7 +10,6 @@ from scheduler import get_wsd_lr_ratio
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 
-
 local_rank = int(os.environ["LOCAL_RANK"])
 torch.cuda.set_device(local_rank)  
 device = torch.device("cuda", local_rank)
