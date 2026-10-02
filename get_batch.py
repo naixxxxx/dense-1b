@@ -11,26 +11,26 @@ tokens = np.memmap(
 
 TOTAL_TOKENS = len(tokens)
 
-pos = 0
+tokens_seen = 0
 
 
 def get_batch():
-    global pos
+    global tokens_seen
 
-    if pos + SEQ_LEN >= len(tokens):
+    if tokens_seen + SEQ_LEN >= len(tokens):
         return None
 
     x = np.asarray(
-        tokens[pos : pos + SEQ_LEN],
+        tokens[tokens_seen : tokens_seen + SEQ_LEN],
         dtype=np.int64,
     )
 
     y = np.asarray(
-        tokens[pos + 1 : pos + SEQ_LEN + 1],
+        tokens[tokens_seen + 1 : tokens_seen + SEQ_LEN + 1],
         dtype=np.int64,
     )
 
-    pos += SEQ_LEN
+    tokens_seen += SEQ_LEN
 
     x = torch.from_numpy(x)
     y = torch.from_numpy(y)

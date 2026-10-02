@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 
 from model import GPT
-from get_batch import get_batch,TOTAL_TOKENS
+import get_batch as data # data.TOTAL_TOKENS data.tokens_seen
 
 device = "cuda"
 
@@ -62,7 +62,7 @@ adamw_optimizer = torch.optim.AdamW(
 )
 
 while True:
-    batch = get_batch()
+    batch = data.get_batch()
     if batch is None:
         break
 
