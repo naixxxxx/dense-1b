@@ -41,7 +41,7 @@
     - dt_bias
     - etc. 1D / scalar parameters
 
+test:
+uv run torchrun --standalone --nnodes=1 --nproc-per-node=1 train.py
 
-代办: 
-模型加载保存 DDP
- inference代码 benchmark代码
+ inference benchmark
