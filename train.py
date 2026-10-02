@@ -110,13 +110,14 @@ if Path("checkpoints/latest.pt").is_file():
 
 ddp_model = DDP(model, device_ids=[local_rank])
 
-run = wandb.init(project="pretrain-dense-1b")
+if rank == 0:
+    run = wandb.init(project="pretrain-dense-1b")
 
-run.define_metric("tokens")
-run.define_metric("loss", step_metric="tokens")
-run.define_metric("grad_norm", step_metric="tokens")
-run.define_metric("muon_lr", step_metric="tokens")
-run.define_metric("adamw_lr", step_metric="tokens")
+    run.define_metric("tokens")
+    run.define_metric("loss", step_metric="tokens")
+    run.define_metric("grad_norm", step_metric="tokens")
+    run.define_metric("muon_lr", step_metric="tokens")
+    run.define_metric("adamw_lr", step_metric="tokens")
 
 save_every = data.TOTAL_TOKENS // 10
 next_save_tokens = ((data.tokens_seen // save_every) + 1) * save_every
@@ -156,17 +157,24 @@ while True:
     muon_optimizer.step()
     adamw_optimizer.step()
 
-    run.log({
-        "tokens": data.tokens_seen,
-        "loss": loss.item(),
-        "grad_norm": grad_norm.item(),
-        "muon_lr": muon_optimizer.param_groups[0]["lr"],
-        "adamw_lr": adamw_optimizer.param_groups[0]["lr"],
-    })
+    loss_mean = loss.detach().clone()
+    dist.all_reduce(loss_mean, op=dist.ReduceOp.SUM)
+    loss_mean /= world_size
+
+    if rank == 0:
+        run.log({
+            "tokens": data.tokens_seen,
+            "loss": loss_mean.item(),
+            "grad_norm": grad_norm.item(),
+            "muon_lr": muon_optimizer.param_groups[0]["lr"],
+            "adamw_lr": adamw_optimizer.param_groups[0]["lr"],
+        })
 
     if data.tokens_seen >= next_save_tokens:
         save_checkpoint()
         next_save_tokens +=  save_every
 
-run.finish()
+if rank == 0:
+    run.finish()
+
 dist.destroy_process_group()
