@@ -2,11 +2,22 @@ import torch
 import torch.nn.functional as F
 import wandb
 import get_batch as data # data.TOTAL_TOKENS data.tokens_seen
+import os
+import torch.distributed as dist
 from pathlib import Path
 from model import GPT
 from scheduler import get_wsd_lr_ratio
+from torch.nn.parallel import DistributedDataParallel as DDP
 
-device = "cuda"
+
+
+local_rank = int(os.environ["LOCAL_RANK"])
+torch.cuda.set_device(local_rank)  
+device = torch.device("cuda", local_rank)
+dist.init_process_group(backend="nccl")
+rank = dist.get_rank()
+world_size = dist.get_world_size()
+
 
 model = GPT(
     vocab_size=151936,
@@ -68,6 +79,9 @@ adamw_optimizer = torch.optim.AdamW(
 
 
 def save_checkpoint():
+    if rank != 0:
+        return
+
     checkpoint = {
         "model": model.state_dict(),
         "muon": muon_optimizer.state_dict(),
@@ -93,6 +107,9 @@ if Path("checkpoints/latest.pt").is_file():
 
     del checkpoint    
 
+
+ddp_model = DDP(model, device_ids=[local_rank])
+
 run = wandb.init(project="pretrain-dense-1b")
 
 run.define_metric("tokens")
@@ -105,7 +122,7 @@ save_every = data.TOTAL_TOKENS // 10
 next_save_tokens = ((data.tokens_seen // save_every) + 1) * save_every
 
 while True:
-    batch = data.get_batch()
+    batch = data.get_batch(rank, world_size)
     if batch is None:
         save_checkpoint()
         break
@@ -126,7 +143,7 @@ while True:
     adamw_optimizer.zero_grad()
 
     with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
-        logits = model(x)  # [1, 4096, vocab_size]
+        logits = ddp_model(x)  # [1, 4096, vocab_size]
         loss = F.cross_entropy(
             logits.reshape(-1, logits.size(-1)),
             y.reshape(-1),
@@ -152,3 +169,4 @@ while True:
         next_save_tokens +=  save_every
 
 run.finish()
+dist.destroy_process_group()

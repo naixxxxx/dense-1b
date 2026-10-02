@@ -14,23 +14,27 @@ TOTAL_TOKENS = len(tokens)
 tokens_seen = 0
 
 
-def get_batch():
+def get_batch(rank, world_size):
     global tokens_seen
 
-    if tokens_seen + SEQ_LEN >= len(tokens):
+    step_tokens = SEQ_LEN * world_size
+
+    if tokens_seen + step_tokens >= len(tokens):
         return None
 
+    start = tokens_seen + rank * SEQ_LEN
+
     x = np.asarray(
-        tokens[tokens_seen : tokens_seen + SEQ_LEN],
+        tokens[start : start + SEQ_LEN],
         dtype=np.int64,
     )
 
     y = np.asarray(
-        tokens[tokens_seen + 1 : tokens_seen + SEQ_LEN + 1],
+        tokens[start + 1 : start + SEQ_LEN + 1],
         dtype=np.int64,
     )
 
-    tokens_seen += SEQ_LEN
+    tokens_seen += step_tokens
 
     x = torch.from_numpy(x)
     y = torch.from_numpy(y)
