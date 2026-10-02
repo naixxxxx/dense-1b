@@ -13,7 +13,7 @@ EOD_ID = tokenizer.convert_tokens_to_ids("<|endoftext|>")
 
 parquet_file = pq.ParquetFile(path)                                                                                                                                
 
-with open("data/en_000.bin", "ab") as f:
+with open("data/train_data.bin", "ab") as f:
 
     for batch in parquet_file.iter_batches(
         batch_size=1024,

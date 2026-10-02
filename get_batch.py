@@ -4,7 +4,7 @@ import torch
 SEQ_LEN = 4096
 
 tokens = np.memmap(
-    "data/en_000.bin",
+    "data/train_data.bin",
     dtype=np.uint32,
     mode="r",
 )

@@ -22,13 +22,13 @@ world_size = dist.get_world_size()
 
 
 model = GPT(
-    vocab_size=151936,
-    d_model=128,
-    d_ff=384,
-    num_layers=8,
-    num_heads=4,
-    num_kv_heads=1,
-    head_dim=32,
+   vocab_size=151936,
+    d_model=1280,
+    d_ff=3840,
+    num_layers=24,
+    num_heads=16,
+    num_kv_heads=4,
+    head_dim=128,
 ).to(device)
 
 
@@ -113,7 +113,7 @@ if Path("checkpoints/latest.pt").is_file():
 ddp_model = DDP(model, device_ids=[local_rank])
 
 if rank == 0:
-    run = wandb.init(project="pretrain-dense-1b",name="test-3060-ddp",)
+    run = wandb.init(project="pretrain-dense-1b",name="4090-ddp-8gpu-1node")
 
     run.define_metric("tokens")
     run.define_metric("loss", step_metric="tokens")
