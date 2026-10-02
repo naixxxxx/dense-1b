@@ -42,7 +42,6 @@
     - etc. 1D / scalar parameters
 
 
-代办: get_batch all_tokens token_seen
- WSD  wandb指标  lr loss grad_norm tokens
-模型加载保存  改成DDP
+代办: 
+模型加载保存 DDP
 训练完 inference代码 benchmark代码

@@ -1,8 +1,10 @@
 import torch
 import torch.nn.functional as F
+import wandb
+import get_batch as data # data.TOTAL_TOKENS data.tokens_seen
 
 from model import GPT
-import get_batch as data # data.TOTAL_TOKENS data.tokens_seen
+from scheduler import get_wsd_lr_ratio
 
 device = "cuda"
 
@@ -38,9 +40,12 @@ for name, param in model.named_parameters():
         adamw_no_decay_params.append(param)
 
 
+muon_base_lr = 0.02
+adamw_base_lr = 3e-4
+
 muon_optimizer = torch.optim.Muon(
     muon_params,
-    lr=0.02,
+    lr=muon_base_lr,
     momentum=0.95,
     weight_decay=0.1,
     nesterov=True
@@ -57,14 +62,31 @@ adamw_optimizer = torch.optim.AdamW(
             "weight_decay": 0.0,
         },
     ],
-    lr=3e-4,
+    lr=adamw_base_lr,
     betas=(0.9, 0.95),
 )
+
+
+run = wandb.init(project="pretrain-dense-1b")
+
+run.define_metric("tokens")
+run.define_metric("loss", step_metric="tokens")
+run.define_metric("grad_norm", step_metric="tokens")
+run.define_metric("muon_lr", step_metric="tokens")
+run.define_metric("adamw_lr", step_metric="tokens")
 
 while True:
     batch = data.get_batch()
     if batch is None:
         break
+
+    lr_ratio = get_wsd_lr_ratio(data.tokens_seen, data.TOTAL_TOKENS)
+
+    for group in muon_optimizer.param_groups:
+        group["lr"] = muon_base_lr * lr_ratio
+
+    for group in adamw_optimizer.param_groups:
+        group["lr"] = adamw_base_lr * lr_ratio
 
     x, y = batch
     x = x.unsqueeze(0).to(device)  # [4096] → [1, 4096]
@@ -82,7 +104,16 @@ while True:
 
     loss.backward()
 
-    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+    grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
     muon_optimizer.step()
     adamw_optimizer.step()
+    run.log({
+        "tokens": data.tokens_seen,
+        "loss": loss.item(),
+        "grad_norm": grad_norm.item(),
+        "muon_lr": muon_optimizer.param_groups[0]["lr"],
+        "adamw_lr": adamw_optimizer.param_groups[0]["lr"],
+    })
+
+run.finish()
