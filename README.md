@@ -42,6 +42,7 @@
     - etc. 1D / scalar parameters
 
 test:
-uv run torchrun --standalone --nnodes=1 --nproc-per-node=1 train.py
+uv run torchrun --standalone --nproc_per_node=1 train.py > train.log 2>&1 &
 
+ddl:
  inference benchmark
