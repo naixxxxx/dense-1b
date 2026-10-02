@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 import wandb
 import get_batch as data # data.TOTAL_TOKENS data.tokens_seen
-
+from pathlib import Path
 from model import GPT
 from scheduler import get_wsd_lr_ratio
 
@@ -67,6 +67,32 @@ adamw_optimizer = torch.optim.AdamW(
 )
 
 
+def save_checkpoint():
+    checkpoint = {
+        "model": model.state_dict(),
+        "muon": muon_optimizer.state_dict(),
+        "adamw": adamw_optimizer.state_dict(),
+        "tokens_seen": data.tokens_seen,
+    }
+
+    torch.save(checkpoint, "checkpoints/latest.tmp")
+    Path("checkpoints/latest.tmp").replace("checkpoints/latest.pt")
+
+
+if Path("checkpoints/latest.pt").is_file():
+    checkpoint = torch.load(
+        "checkpoints/latest.pt",
+        map_location="cpu",
+        weights_only=True,
+    )
+
+    model.load_state_dict(checkpoint["model"])
+    muon_optimizer.load_state_dict(checkpoint["muon"])
+    adamw_optimizer.load_state_dict(checkpoint["adamw"])
+    data.tokens_seen = checkpoint["tokens_seen"]
+
+    del checkpoint    
+
 run = wandb.init(project="pretrain-dense-1b")
 
 run.define_metric("tokens")
@@ -75,9 +101,13 @@ run.define_metric("grad_norm", step_metric="tokens")
 run.define_metric("muon_lr", step_metric="tokens")
 run.define_metric("adamw_lr", step_metric="tokens")
 
+save_every = data.TOTAL_TOKENS // 10
+next_save_tokens = ((data.tokens_seen // save_every) + 1) * save_every
+
 while True:
     batch = data.get_batch()
     if batch is None:
+        save_checkpoint()
         break
 
     lr_ratio = get_wsd_lr_ratio(data.tokens_seen, data.TOTAL_TOKENS)
@@ -108,6 +138,7 @@ while True:
 
     muon_optimizer.step()
     adamw_optimizer.step()
+
     run.log({
         "tokens": data.tokens_seen,
         "loss": loss.item(),
@@ -115,5 +146,9 @@ while True:
         "muon_lr": muon_optimizer.param_groups[0]["lr"],
         "adamw_lr": adamw_optimizer.param_groups[0]["lr"],
     })
+
+    if data.tokens_seen >= next_save_tokens:
+        save_checkpoint()
+        next_save_tokens +=  save_every
 
 run.finish()
