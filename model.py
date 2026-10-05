@@ -174,13 +174,13 @@ class GatedAttention(nn.Module):
         q = self.q_norm(q)
         k = self.k_norm(k)
 
+        num_groups = self.num_heads // self.num_kv_heads
+        k = k.repeat_interleave(num_groups, dim=2)
+        v = v.repeat_interleave(num_groups, dim=2)
+
         q = q.transpose(1, 2)
         k = k.transpose(1, 2)
         v = v.transpose(1, 2)
-
-        num_groups = self.num_heads // self.num_kv_heads
-        k = k.repeat_interleave(num_groups, dim=1)
-        v = v.repeat_interleave(num_groups, dim=1)
 
         attn_output = F.scaled_dot_product_attention(q, k, v, is_causal=True)
 
