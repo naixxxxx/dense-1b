@@ -1,6 +1,5 @@
 ## Model
 
-```text
 parameters    = 1,176,784,704
 vocab_size    = 151936
 d_model       = 1280
@@ -12,11 +11,9 @@ head_dim      = 128
 
 tokens        = 20B
 seq_len       = 4096
-```
 
 ## Optimizer
 
-```text
 Muon
   lr          = 2e-2
   momentum    = 0.95
@@ -25,16 +22,13 @@ Muon
 AdamW
   lr          = 3e-4
   betas       = (0.9, 0.95)
-```
 
 ## WSD
 
-```text
 warmup        = 0.02
 stable        = 0.88
 decay         = 0.10
 min_lr_ratio  = 0.00
-```
 
 ## Parameter Groups
 
