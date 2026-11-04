@@ -3,11 +3,12 @@ import pyarrow.parquet as pq
 from transformers import AutoTokenizer
 from tqdm import tqdm
 
-path = "raw_data/part-00000.parquet"
-
+path = "raw_data/part-00002.parquet"
+#目前到 0 1 2
 tokenizer = AutoTokenizer.from_pretrained(
     "Qwen/Qwen3-0.6B-Base",
     use_fast=True,
+    
 )
 
 EOD_ID = tokenizer.convert_tokens_to_ids("<|endoftext|>")
