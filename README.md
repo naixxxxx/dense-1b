@@ -12,6 +12,11 @@ head_dim      = 128
 tokens        = 20B
 seq_len       = 4096
 
+## Tokenizer
+
+Qwen/Qwen3-0.6B-Base
+
+
 ## Optimizer
 
 Muon
