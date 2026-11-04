@@ -113,6 +113,7 @@ class GatedDeltaNetLayer(nn.Module):
             hidden_size=d_model,
             num_heads=num_heads,
             head_dim=head_dim,
+            expand_v=1.0,
             norm_eps=1e-6,
         )
 
