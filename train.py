@@ -36,58 +36,18 @@ muon_params = []
 adamw_decay_params = []
 adamw_no_decay_params = []
 
-muon_names = {
-    "gated_deltanet.gated_deltanet.q_proj.weight",
-    "gated_deltanet.gated_deltanet.k_proj.weight",
-    "gated_deltanet.gated_deltanet.v_proj.weight",
-    "gated_deltanet.gated_deltanet.a_proj.weight",
-    "gated_deltanet.gated_deltanet.b_proj.weight",
-    "gated_deltanet.gated_deltanet.g_proj.weight",
-    "gated_deltanet.gated_deltanet.o_proj.weight",
-    "attn.q_proj.weight",
-    "attn.k_proj.weight",
-    "attn.v_proj.weight",
-    "attn.gate_proj.weight",
-    "attn.o_proj.weight",
-    "ffn.gate_proj.weight",
-    "ffn.up_proj.weight",
-    "ffn.down_proj.weight",
-}
-
-adamw_decay_names = {
-    "gated_deltanet.gated_deltanet.q_conv1d.weight",
-    "gated_deltanet.gated_deltanet.k_conv1d.weight",
-    "gated_deltanet.gated_deltanet.v_conv1d.weight",
-}
-
-adamw_no_decay_names = {
-    "attn_norm.weight",
-    "ffn_norm.weight",
-    "gated_deltanet.gated_deltanet.A_log",
-    "gated_deltanet.gated_deltanet.dt_bias",
-    "gated_deltanet.gated_deltanet.o_norm.weight",
-    "attn.q_norm.weight",
-    "attn.k_norm.weight",
-}
-
 for name, param in model.named_parameters():
     if name.startswith("embedding.") or name.startswith("lm_head."):
         adamw_decay_params.append(param)
 
-    elif name == "norm.weight":
-        adamw_no_decay_params.append(param)
+    elif param.ndim == 2:
+        muon_params.append(param)
+
+    elif param.ndim == 3:
+        adamw_decay_params.append(param)
 
     else:
-        layer_name = name.split(".", 2)[2]
-
-        if layer_name in muon_names:
-            muon_params.append(param)
-
-        elif layer_name in adamw_decay_names:
-            adamw_decay_params.append(param)
-
-        elif layer_name in adamw_no_decay_names:
-            adamw_no_decay_params.append(param)
+        adamw_no_decay_params.append(param)
 
 
 muon_base_lr = 0.02
