@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from fla.layers.kda import KimiDeltaAttention
+from fla.layers.gated_deltanet import GatedDeltaNet
  
 
 class GPT(nn.Module):
@@ -26,7 +26,7 @@ class GPT(nn.Module):
             if (i + 1) % 4 == 0:
                 block = GatedAttentionBlock(d_model, d_ff, num_heads, num_kv_heads, head_dim)
             else:
-                block = KDABlock(d_model, d_ff, num_heads, head_dim)
+                block = GatedDeltaNetBlock(d_model, d_ff, num_heads, head_dim)
 
             self.layers.append(block)
 
@@ -105,18 +105,19 @@ class FFN(nn.Module):
         return self.down_proj(F.silu(self.gate_proj(x)) * self.up_proj(x))
 
 
-class KDA(nn.Module):
+class GatedDeltaNetLayer(nn.Module):
     def __init__(self, d_model, num_heads, head_dim):
         super().__init__()
 
-        self.kda = KimiDeltaAttention(
+        self.gated_deltanet = GatedDeltaNet(
             hidden_size=d_model,
             num_heads=num_heads,
             head_dim=head_dim,
+            norm_eps=1e-6,
         )
 
-        for module in self.kda.modules():
-            if isinstance(module, nn.Linear):
+        for module in self.gated_deltanet.modules():
+            if isinstance(module, (nn.Linear, nn.Conv1d)):
                 nn.init.trunc_normal_(
                     module.weight,
                     mean=0.0,
@@ -129,9 +130,8 @@ class KDA(nn.Module):
                     nn.init.zeros_(module.bias)
 
     def forward(self, x):
-        output, _, _ = self.kda(x)
+        output, _, _ = self.gated_deltanet(x)
         return output
-
 
 class GatedAttention(nn.Module):
     def __init__(self, d_model, num_heads, num_kv_heads, head_dim):
@@ -193,12 +193,12 @@ class GatedAttention(nn.Module):
         output = self.o_proj(attn_output)
         return output
 
-class KDABlock(nn.Module):
+class GatedDeltaNetBlock(nn.Module):
     def __init__(self, d_model, d_ff, num_heads, head_dim):
         super().__init__()
 
         self.attn_norm = nn.RMSNorm(d_model, eps=1e-6)
-        self.kda = KDA(d_model, num_heads, head_dim)
+        self.gated_deltanet = GatedDeltaNetLayer(d_model, num_heads, head_dim)
 
         self.ffn_norm = nn.RMSNorm(d_model, eps=1e-6)
         self.ffn = FFN(d_model, d_ff)
@@ -206,7 +206,7 @@ class KDABlock(nn.Module):
     def forward(self, x):
         residual = x
         x = self.attn_norm(x)
-        x = self.kda(x)
+        x = self.gated_deltanet(x)
         x = residual + x
 
         residual = x
