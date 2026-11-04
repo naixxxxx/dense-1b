@@ -1,5 +1,5 @@
     # parameters
-    parameters=1,002,931,488
+    parameters=1,176,784,704
     vocab_size=151936,
     d_model=1280,
     d_ff=3840,
