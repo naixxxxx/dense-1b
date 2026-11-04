@@ -40,7 +40,10 @@ for name, param in model.named_parameters():
     if not param.requires_grad:
         continue
 
-    if name.startswith("embedding.") or name.startswith("lm_head."):
+    if getattr(param, "_no_weight_decay", False):
+        adamw_no_decay_params.append(param)
+
+    elif name.startswith("embedding.") or name.startswith("lm_head."):
         adamw_decay_params.append(param)
 
     elif param.ndim == 2:

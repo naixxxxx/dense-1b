@@ -116,18 +116,25 @@ class GatedDeltaNetLayer(nn.Module):
             norm_eps=1e-6,
         )
 
-        for module in self.gated_deltanet.modules():
-            if isinstance(module, (nn.Linear, nn.Conv1d)):
-                nn.init.trunc_normal_(
-                    module.weight,
-                    mean=0.0,
-                    std=0.02,
-                    a=-0.06,
-                    b=0.06,
-                )
-
-                if module.bias is not None:
-                    nn.init.zeros_(module.bias)
+        for weight in [
+            self.gated_deltanet.q_proj.weight,
+            self.gated_deltanet.k_proj.weight,
+            self.gated_deltanet.v_proj.weight,
+            self.gated_deltanet.a_proj.weight,
+            self.gated_deltanet.b_proj.weight,
+            self.gated_deltanet.g_proj.weight,
+            self.gated_deltanet.o_proj.weight,
+            self.gated_deltanet.q_conv1d.weight,
+            self.gated_deltanet.k_conv1d.weight,
+            self.gated_deltanet.v_conv1d.weight,
+        ]:
+            nn.init.trunc_normal_(
+                weight,
+                mean=0.0,
+                std=0.02,
+                a=-0.06,
+                b=0.06,
+            )
 
     def forward(self, x):
         output, _, _ = self.gated_deltanet(x)
