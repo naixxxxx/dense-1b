@@ -3,8 +3,8 @@ import pyarrow.parquet as pq
 from transformers import AutoTokenizer
 from tqdm import tqdm
 
-path = "raw_data/part-00002.parquet"
-#目前到 0 1 2
+
+path = "raw_data/xx.parquet"
 tokenizer = AutoTokenizer.from_pretrained(
     "Qwen/Qwen3-0.6B-Base",
     use_fast=True,
@@ -42,3 +42,5 @@ with open("data/train_data.bin", "ab") as f:
             id_list.append(EOD_ID)
 
         np.asarray(id_list, dtype=np.uint32).tofile(f)
+
+
