@@ -9,7 +9,7 @@ num_heads     = 16
 num_kv_heads  = 4
 head_dim      = 128
 
-tokens        = 20B
+tokens        =  19,682,992,109
 seq_len       = 4096
 
 ## Tokenizer
