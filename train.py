@@ -121,12 +121,12 @@ save_every = data.TOTAL_TOKENS // 10
 next_save_tokens = ((data.tokens_seen // save_every) + 1) * save_every
 
 while True:
+    lr_ratio = get_wsd_lr_ratio(data.tokens_seen, data.TOTAL_TOKENS)
     batch = data.get_batch(rank, world_size)
     if batch is None:
         save_checkpoint()
         break
 
-    lr_ratio = get_wsd_lr_ratio(data.tokens_seen, data.TOTAL_TOKENS)
 
     for group in muon_optimizer.param_groups:
         group["lr"] = muon_base_lr * lr_ratio
