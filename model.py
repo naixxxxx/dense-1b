@@ -32,6 +32,7 @@ class GPT(nn.Module):
 
         self.norm = nn.RMSNorm(d_model, eps=1e-6)
         self.lm_head = LMHead(d_model, vocab_size)
+        self.lm_head.proj.weight = self.embedding.embedding.weight        
 
     def forward(self, input_ids):
         x = self.embedding(input_ids)

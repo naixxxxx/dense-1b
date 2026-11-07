@@ -1,36 +1,40 @@
 
 ========== UNIQUE NAME PATTERNS (layer index -> *) ==========
-embedding.embedding.weight                                               shape=(151936, 1280)         ndim=2 group=adamw_decay
-layers.*.attn_norm.weight                                                shape=(1280,)                ndim=1 group=adamw_no_decay
-layers.*.gated_deltanet.gated_deltanet.A_log                             shape=(16,)                  ndim=1 group=adamw_no_decay
-layers.*.gated_deltanet.gated_deltanet.dt_bias                           shape=(16,)                  ndim=1 group=adamw_no_decay
-layers.*.gated_deltanet.gated_deltanet.q_proj.weight                     shape=(2048, 1280)           ndim=2 group=muon
-layers.*.gated_deltanet.gated_deltanet.k_proj.weight                     shape=(2048, 1280)           ndim=2 group=muon
-layers.*.gated_deltanet.gated_deltanet.v_proj.weight                     shape=(2048, 1280)           ndim=2 group=muon
-layers.*.gated_deltanet.gated_deltanet.a_proj.weight                     shape=(16, 1280)             ndim=2 group=muon
-layers.*.gated_deltanet.gated_deltanet.b_proj.weight                     shape=(16, 1280)             ndim=2 group=muon
-layers.*.gated_deltanet.gated_deltanet.q_conv1d.weight                   shape=(2048, 1, 4)           ndim=3 group=adamw_decay
-layers.*.gated_deltanet.gated_deltanet.k_conv1d.weight                   shape=(2048, 1, 4)           ndim=3 group=adamw_decay
-layers.*.gated_deltanet.gated_deltanet.v_conv1d.weight                   shape=(2048, 1, 4)           ndim=3 group=adamw_decay
-layers.*.gated_deltanet.gated_deltanet.g_proj.weight                     shape=(2048, 1280)           ndim=2 group=muon
-layers.*.gated_deltanet.gated_deltanet.o_norm.weight                     shape=(128,)                 ndim=1 group=adamw_no_decay
-layers.*.gated_deltanet.gated_deltanet.o_proj.weight                     shape=(1280, 2048)           ndim=2 group=muon
-layers.*.ffn_norm.weight                                                 shape=(1280,)                ndim=1 group=adamw_no_decay
-layers.*.ffn.gate_proj.weight                                            shape=(3840, 1280)           ndim=2 group=muon
-layers.*.ffn.up_proj.weight                                              shape=(3840, 1280)           ndim=2 group=muon
-layers.*.ffn.down_proj.weight                                            shape=(1280, 3840)           ndim=2 group=muon
-layers.*.attn.q_proj.weight                                              shape=(2048, 1280)           ndim=2 group=muon
-layers.*.attn.k_proj.weight                                              shape=(512, 1280)            ndim=2 group=muon
-layers.*.attn.v_proj.weight                                              shape=(512, 1280)            ndim=2 group=muon
-layers.*.attn.gate_proj.weight                                           shape=(2048, 1280)           ndim=2 group=muon
-layers.*.attn.o_proj.weight                                              shape=(1280, 2048)           ndim=2 group=muon
-layers.*.attn.q_norm.weight                                              shape=(128,)                 ndim=1 group=adamw_no_decay
-layers.*.attn.k_norm.weight                                              shape=(128,)                 ndim=1 group=adamw_no_decay
-norm.weight                                                              shape=(1280,)                ndim=1 group=adamw_no_decay
-lm_head.proj.weight                                                      shape=(151936, 1280)         ndim=2 group=adamw_decay
+embedding.embedding.weight                                                  shape=(151936, 1280)         ndim=2 group=adamw_decay
+layers.*.attn_norm.weight                                                   shape=(1280,)                ndim=1 group=adamw_no_decay
+layers.*.gated_deltanet.gated_deltanet.A_log                                shape=(16,)                  ndim=1 group=adamw_no_decay
+layers.*.gated_deltanet.gated_deltanet.dt_bias                              shape=(16,)                  ndim=1 group=adamw_no_decay
+layers.*.gated_deltanet.gated_deltanet.q_proj.weight                        shape=(2048, 1280)           ndim=2 group=muon
+layers.*.gated_deltanet.gated_deltanet.k_proj.weight                        shape=(2048, 1280)           ndim=2 group=muon
+layers.*.gated_deltanet.gated_deltanet.v_proj.weight                        shape=(2048, 1280)           ndim=2 group=muon
+layers.*.gated_deltanet.gated_deltanet.a_proj.weight                        shape=(16, 1280)             ndim=2 group=muon
+layers.*.gated_deltanet.gated_deltanet.b_proj.weight                        shape=(16, 1280)             ndim=2 group=muon
+layers.*.gated_deltanet.gated_deltanet.q_conv1d.weight                      shape=(2048, 1, 4)           ndim=3 group=adamw_decay
+layers.*.gated_deltanet.gated_deltanet.k_conv1d.weight                      shape=(2048, 1, 4)           ndim=3 group=adamw_decay
+layers.*.gated_deltanet.gated_deltanet.v_conv1d.weight                      shape=(2048, 1, 4)           ndim=3 group=adamw_decay
+layers.*.gated_deltanet.gated_deltanet.g_proj.weight                        shape=(2048, 1280)           ndim=2 group=muon
+layers.*.gated_deltanet.gated_deltanet.o_norm.weight                        shape=(128,)                 ndim=1 group=adamw_no_decay
+layers.*.gated_deltanet.gated_deltanet.o_proj.weight                        shape=(1280, 2048)           ndim=2 group=muon
+layers.*.ffn_norm.weight                                                    shape=(1280,)                ndim=1 group=adamw_no_decay
+layers.*.ffn.gate_proj.weight                                               shape=(3840, 1280)           ndim=2 group=muon
+layers.*.ffn.up_proj.weight                                                 shape=(3840, 1280)           ndim=2 group=muon
+layers.*.ffn.down_proj.weight                                               shape=(1280, 3840)           ndim=2 group=muon
+layers.*.attn.q_proj.weight                                                 shape=(2048, 1280)           ndim=2 group=muon
+layers.*.attn.k_proj.weight                                                 shape=(512, 1280)            ndim=2 group=muon
+layers.*.attn.v_proj.weight                                                 shape=(512, 1280)            ndim=2 group=muon
+layers.*.attn.gate_proj.weight                                              shape=(2048, 1280)           ndim=2 group=muon
+layers.*.attn.o_proj.weight                                                 shape=(1280, 2048)           ndim=2 group=muon
+layers.*.attn.q_norm.weight                                                 shape=(128,)                 ndim=1 group=adamw_no_decay
+layers.*.attn.k_norm.weight                                                 shape=(128,)                 ndim=1 group=adamw_no_decay
+norm.weight                                                                 shape=(1280,)                ndim=1 group=adamw_no_decay
 
 ========== PARAMETER COUNTS BY GROUP ==========
-muon                      645,611,520
-adamw_decay               389,398,528
-adamw_no_decay                 67,136
-total                   1,035,077,184
+muon                          645,611,520
+adamw_decay                   194,920,448
+adamw_no_decay                     67,136
+total                         840,599,104
+
+========== WEIGHT TYING CHECK ==========
+embedding.weight is lm_head.weight: True
+shared weight shape: (151936, 1280)
+unique parameter count: 840,599,104

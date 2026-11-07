@@ -1,6 +1,6 @@
 ## Model
 
-parameters    = 1,035,077,184
+parameters    = 840,599,104
 vocab_size    = 151936
 d_model       = 1280
 d_ff          = 3840
