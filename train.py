@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 import torch
-import torch.nn.functional as F
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 
@@ -142,11 +141,7 @@ while True:
     adamw_optimizer.zero_grad()
 
     with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
-        logits = ddp_model(x)  # [1, 4096, vocab_size]
-        loss = F.cross_entropy(
-            logits.reshape(-1, logits.size(-1)),
-            y.reshape(-1),
-        )
+        loss = ddp_model(x, y)
 
     loss.backward()
 

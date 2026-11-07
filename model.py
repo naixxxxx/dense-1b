@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from fla.layers.gated_deltanet import GatedDeltaNet
+from liger_kernel.transformers import LigerFusedLinearCrossEntropyLoss
  
 
 class GPT(nn.Module):
@@ -32,18 +33,25 @@ class GPT(nn.Module):
 
         self.norm = nn.RMSNorm(d_model, eps=1e-6)
         self.lm_head = LMHead(d_model, vocab_size)
-        self.lm_head.proj.weight = self.embedding.embedding.weight        
+        self.lm_head.proj.weight = self.embedding.embedding.weight
+        self.loss_fn = LigerFusedLinearCrossEntropyLoss()
 
-    def forward(self, input_ids):
+    def forward(self, input_ids, labels=None):
         x = self.embedding(input_ids)
 
         for layer in self.layers:
             x = layer(x)
 
         x = self.norm(x)
-        logits = self.lm_head(x)
 
-        return logits
+        if labels is not None:
+            return self.loss_fn(
+                self.lm_head.proj.weight,
+                x.reshape(-1, x.size(-1)),
+                labels.reshape(-1),
+            )
+
+        return self.lm_head(x)
 
 
 
