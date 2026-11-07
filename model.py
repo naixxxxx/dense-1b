@@ -4,6 +4,7 @@ import torch.nn.functional as F
 
 from fla.layers.gated_deltanet import GatedDeltaNet
 from liger_kernel.transformers import LigerFusedLinearCrossEntropyLoss
+from torch.utils.checkpoint import checkpoint
  
 
 class GPT(nn.Module):
@@ -40,7 +41,10 @@ class GPT(nn.Module):
         x = self.embedding(input_ids)
 
         for layer in self.layers:
-            x = layer(x)
+            if self.training:
+                x = checkpoint(layer, x, use_reentrant=False)
+            else:
+                x = layer(x)
 
         x = self.norm(x)
 
