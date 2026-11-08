@@ -11,6 +11,9 @@ from model import GPT
 from scheduler import get_wsd_lr_ratio
 
 
+BATCH_SIZE = 9  #  batch size
+
+
 local_rank = int(os.environ["LOCAL_RANK"])
 torch.cuda.set_device(local_rank)  
 device = torch.device("cuda", local_rank)
@@ -121,10 +124,12 @@ next_save_tokens = ((data.tokens_seen // save_every) + 1) * save_every
 
 while True:
     lr_ratio = get_wsd_lr_ratio(data.tokens_seen, data.TOTAL_TOKENS)
-    batch = data.get_batch(rank, world_size)
-    if batch is None:
+    # Ensure a full per-GPU batch can be read before advancing tokens_seen.
+    if data.tokens_seen + BATCH_SIZE * data.SEQ_LEN * world_size >= data.TOTAL_TOKENS:
         save_checkpoint()
         break
+
+    batches = [data.get_batch(rank, world_size) for _ in range(BATCH_SIZE)]
 
 
     for group in muon_optimizer.param_groups:
@@ -133,9 +138,8 @@ while True:
     for group in adamw_optimizer.param_groups:
         group["lr"] = adamw_base_lr * lr_ratio
 
-    x, y = batch
-    x = x.unsqueeze(0).to(device)  # [4096] → [1, 4096]
-    y = y.unsqueeze(0).to(device)
+    x = torch.stack([batch[0] for batch in batches]).to(device)
+    y = torch.stack([batch[1] for batch in batches]).to(device)
 
     muon_optimizer.zero_grad()
     adamw_optimizer.zero_grad()
