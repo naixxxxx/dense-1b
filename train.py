@@ -108,7 +108,7 @@ if Path("checkpoints/latest.pt").is_file():
 ddp_model = DDP(model, device_ids=[local_rank])
 
 if rank == 0:
-    run = wandb.init(project="pretrain-dense-1b",name="4090-ddp-8gpu-1node")
+    run = wandb.init(project="pretrain-dense-1b",name="4090-4gpu-ddp")
 
     run.define_metric("tokens")
     run.define_metric("loss", step_metric="tokens")

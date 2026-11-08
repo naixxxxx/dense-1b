@@ -1,0 +1,7 @@
+单卡 batch 1 吞吐：
+    1卡 4090：约 5,417 tokens/s
+    8卡 4090（DDP）：约 17,525 tokens/s
+    4卡 4090（DDP）：约  9,677 token/s
+
+单卡支持的最多 batch = 9
+
